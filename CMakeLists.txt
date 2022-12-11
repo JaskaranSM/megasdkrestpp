@@ -4,6 +4,8 @@ project(project)
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(dependencies/include)
+include_directories(dependencies/served/src)
+
 set(LIB_PATH "/home/zerocool/mnt/megaserver/3rdparty_sdk/vcpkg/installed/x64-linux-mega/lib")
 
 add_subdirectory(dependencies/served)
