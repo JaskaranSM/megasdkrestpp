@@ -1,0 +1,3 @@
+[submodule "served"]
+	path = served
+	url = https://github.com/meltwater/served
