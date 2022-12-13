@@ -1,3 +1,12 @@
 [submodule "served"]
 	path = served
 	url = https://github.com/meltwater/served
+[submodule "dependencies/SimpleJSON"]
+	path = dependencies/SimpleJSON
+	url = https://github.com/nbsdx/SimpleJSON
+[submodule "dependencies/loguru"]
+	path = dependencies/loguru
+	url = https://github.com/emilk/loguru
+[submodule "dependencies/sdk"]
+	path = dependencies/sdk
+	url = https://github.com/meganz/sdk
