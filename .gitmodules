@@ -1,6 +1,3 @@
-[submodule "served"]
-	path = served
-	url = https://github.com/meltwater/served
 [submodule "dependencies/SimpleJSON"]
 	path = dependencies/SimpleJSON
 	url = https://github.com/nbsdx/SimpleJSON
@@ -10,3 +7,6 @@
 [submodule "dependencies/sdk"]
 	path = dependencies/sdk
 	url = https://github.com/meganz/sdk
+[submodule "dependencies/served"]
+	path = dependencies/served
+	url = https://github.com/meltwater/served
