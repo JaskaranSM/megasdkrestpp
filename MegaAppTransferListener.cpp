@@ -10,6 +10,10 @@ MegaAppTransferListener::MegaAppTransferListener(std::string gid, mega::MegaApi 
     this->m_gid = gid;
     this->m_api = api;
     this->m_state = mega::MegaTransfer::STATE_QUEUED;
+    this->m_errCode = 0;
+    this->m_isCancelled = false;
+    this->m_isComplete = false;
+    this->m_isFailed = false;
 }
 
 void MegaAppTransferListener::lockAndNotify()
@@ -29,21 +33,20 @@ void MegaAppTransferListener::onTransferStart(mega::MegaApi *api, mega::MegaTran
 
 void MegaAppTransferListener::onTransferFinish(mega::MegaApi *api, mega::MegaTransfer *transfer, mega::MegaError* e)
 {
-    if(e->getErrorCode() != mega::MegaError::API_OK)
+    if (e->getErrorCode() != mega::MegaError::API_OK)
     {
-        this->m_errCode = e->getErrorCode();
-        this->m_errString = e->getErrorString();
-        return;
+        this->m_isFailed = true;
     }
-
+    this->m_errCode = e->getErrorCode();
+    this->m_errString = e->getErrorString();
     this->m_state = transfer->getState();
     this->lockAndNotify();
 
-    if(transfer->isFolderTransfer() && transfer->isFinished())
+    if(transfer->isFolderTransfer() && transfer->isFinished() && e->getErrorCode() == mega::MegaError::API_OK)
     {
         this->m_isComplete = true;
         this->m_cv.notify_all();
-    } else if(transfer->isFinished()) {
+    } else if(transfer->isFinished() && e->getErrorCode() == mega::MegaError::API_OK) {
         this->m_isComplete = true;
         this->m_cv.notify_all();
     }
@@ -51,27 +54,22 @@ void MegaAppTransferListener::onTransferFinish(mega::MegaApi *api, mega::MegaTra
 
 void MegaAppTransferListener::onTransferTemporaryError(mega::MegaApi *api, mega::MegaTransfer *transfer, mega::MegaError e)
 {
-    VLOG_F(2, "MegaAppTransferListener: onTransferTemporaryError: %s", e.toString());
+    VLOG_F(2, "onTransferTemporaryError: %s", e.toString());
 }
 
 void MegaAppTransferListener::onTransferUpdate(mega::MegaApi *api, mega::MegaTransfer *transfer)
 {
-    if(this->IsCancelled())
-    {
-        api->cancelTransfer(this->m_currentTransfer);
-        this->m_state = mega::MegaTransfer::STATE_CANCELLED;
-    }
-
     this->m_speed = transfer->getSpeed();
     this->m_completedLength = transfer->getTransferredBytes();
 
     this->m_state = transfer->getState();
-    VLOG_F(3, "MegaAppTransferListener: onTransferUpdate: %s ", transfer->getFileName());
+    VLOG_F(3, "onTransferUpdate: %s ", transfer->getFileName());
 }
 
 void MegaAppTransferListener::CancelTransfer()
 {
     this->m_isCancelled = true;
+    this->m_api->cancelTransfer(this->m_currentTransfer);
 }
 
 int64_t MegaAppTransferListener::CompletedLength()

@@ -7,20 +7,126 @@
 
 #include "served/multiplexer.hpp"
 #include "served/net/server.hpp"
+#include "MegaDownloader.h"
+#include "json.hpp"
+#include "log.h"
 
 const char kAddDownloadEndpoint[] = "/adddownload";
 const char kGetStatusEndpoint[] = "/getstatus";
+const char kCancelDownloadEndpoint[] = "/canceldownload";
+const char kLoginEndpoint[] = "/login";
 const char kIPAddress[] = "0.0.0.0";
 const char kPort[] = "5000";
 
-
 class HttpServer {
 public:
-    HttpServer(served::multiplexer) : multiplexer(multiplexer) {}
+    HttpServer(MegaDownloader* downloader) : downloader(downloader){}
 
-    void InitEndpoints();
+    auto Login(MegaDownloader* downloader)
+    {
+        return [downloader](served::response & res, const served::request & req) {
+            json::JSON reqBody = json::JSON::Load(req.body());
+            std::string email = reqBody["email"].ToString();
+            std::string password = reqBody["password"].ToString();
+            LOG_F(INFO, "Parsed email: %s | password: %s", email.c_str(), password.c_str());
+            auto resp = downloader->Login(email.c_str(), password.c_str());
+            json::JSON obj = json::Object();
+            obj["error_code"] = resp->errorCode;
+            obj["error_string"] = resp->errorString;
+            std::ostringstream stream;
+            stream << obj;
+            res << stream.str();
+        };
+    }
+
+    auto AddDownload(MegaDownloader* downloader)
+    {
+        return [downloader](served::response & res, const served::request & req) {
+            json::JSON reqBody = json::JSON::Load(req.body());
+            std::string link = reqBody["link"].ToString();
+            std::string dir = reqBody["dir"].ToString();
+            LOG_F(INFO, "Parsed link: %s | dir: %s", link.c_str(), dir.c_str());
+            auto resp = downloader->AddDownload(link.c_str(), dir.c_str());
+            json::JSON obj = json::Object();
+            obj["gid"] = resp->gid;
+            obj["error_code"] = resp->errorCode;
+            obj["error_string"] = resp->errorString;
+            std::ostringstream stream;
+            stream << obj;
+            res << stream.str();
+        };
+    }
+
+    auto CancelDownload(MegaDownloader* downloader)
+    {
+        return [downloader](served::response & res, const served::request & req) {
+            json::JSON reqBody = json::JSON::Load(req.body());
+            std::string gid = reqBody["gid"].ToString();
+            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
+            auto code = downloader->CancelDownloadByGid(gid);
+            json::JSON obj = json::Object();
+            obj["gid"] = gid;
+            obj["error_code"] = code;
+            obj["error_string"] = "";
+            std::ostringstream stream;
+            stream << obj;
+            res << stream.str();
+        };
+    }
+
+    auto GetStatus(MegaDownloader* downloader)
+    {
+        return [downloader](served::response & res, const served::request & req) {
+            json::JSON reqBody = json::JSON::Load(req.body());
+            std::string gid = reqBody["gid"].ToString();
+            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
+            json::JSON obj = json::Object();
+            std::ostringstream stream;
+            obj["gid"] = gid;
+            auto dl = downloader->GetDownloadByGid(gid);
+            if (dl == nullptr) {
+                obj["error_code"] = 404;
+                obj["error_string"] = "gid not found in downloader";
+                res.set_status(404);
+                stream << obj;
+                res << stream.str();
+                return;
+            }
+            auto info = dl->ToDownloadInfo();
+            obj["error_code"] = info->errorCode;
+            obj["error_string"] = info->errorString;
+            obj["name"] = info->name;
+            obj["speed"] = info->speed;
+            obj["completed_length"] = info->completedLength;
+            obj["total_length"] = info->totalLength;
+            obj["state"] = info->state;
+            obj["is_completed"] = info->isCompleted;
+            obj["is_cancelled"] = info->isCancelled;
+            obj["is_failed"] = info->isFailed;
+            delete info;
+            stream << obj;
+            res << stream.str();
+        };
+    }
+
+    void InitEndpoints()
+    {
+        this->multiplexer.handle(kAddDownloadEndpoint).post(this->AddDownload(this->downloader));
+        this->multiplexer.handle(kLoginEndpoint).post(this->Login(this->downloader));
+        this->multiplexer.handle(kGetStatusEndpoint).post(this->GetStatus(this->downloader));
+        this->multiplexer.handle(kCancelDownloadEndpoint).post(this->CancelDownload(this->downloader));
+    }
+
+    void StartServer()
+    {
+        served::net::server server(kIPAddress, kPort, this->multiplexer);
+        LOG_F(INFO, "Starting web server");
+        server.run(1);
+    }
+
 private:
     served::multiplexer multiplexer;
+    MegaDownloader* downloader;
 };
 
 

@@ -1,5 +1,6 @@
 #include <string>
 #include "MegaAppTransferListener.h"
+#include "structs.h"
 
 
 class MegaDownload
@@ -12,12 +13,13 @@ public:
     MegaDownload(std::string name, std::string gid, MegaAppTransferListener *listener);
     int CancelDownload();
     bool IsCompleted();
-    const char* Gid();
-    const char* Name();
+    std::string Gid();
+    std::string Name();
     int64_t CompletedLength();
     int64_t TotalLength();
     int64_t Speed();
     int GetErrorCode();
-    const char* GetErrorString();
+    std::string GetErrorString();
     int GetState();
+    DownloadInfo* ToDownloadInfo();
 };

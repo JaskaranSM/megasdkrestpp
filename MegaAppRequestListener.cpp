@@ -26,36 +26,36 @@ void MegaAppRequestListener::lockAndNotify()
 
 void MegaAppRequestListener::onRequestStart(mega::MegaApi* api, mega::MegaRequest *request)
 {
-    VLOG_F(2, "MegaAppRequestListener: onRequestStart");
+    VLOG_F(2, "onRequestStart");
 }
 
 void MegaAppRequestListener::onRequestUpdate(mega::MegaApi* api,mega::MegaRequest *request)
 {
-    VLOG_F(2, "MegaAppRequestListener: onRequestUpdate");
+    VLOG_F(2, "onRequestUpdate");
 }
 
 void MegaAppRequestListener::onRequestFinish(mega::MegaApi* api, mega::MegaRequest *request, mega::MegaError* e)
 {
-    VLOG_F(2, "MegaAppRequestListener: onRequestFinish");
+    VLOG_F(2, "onRequestFinish");
     this->m_err = e->copy();
     int requestType = request->getType();
     if(e->getErrorCode() != mega::MegaError::API_OK)
     {
-        VLOG_F(2, "MegaAppRequestListener: onRequestFinish: E: %s", e->getErrorString());
+        VLOG_F(2, "onRequestFinish: E: %s", e->getErrorString());
         this->lockAndNotify();
     } else {
         switch(requestType)
         {
             case mega::MegaRequest::TYPE_LOGIN:
-                VLOG_F(2, "MegaAppRequestListener: onRequestFinish: request type is login, starting api->fetchNodes operation");
+                VLOG_F(2, "onRequestFinish: request type is login, starting api->fetchNodes operation");
                 api->fetchNodes(this);
                 break;
             case mega::MegaRequest::TYPE_FETCH_NODES:
-                VLOG_F(2, "MegaAppRequestListener: onRequestFinish: request type is fetchNodes, setting up rootNode");
+                VLOG_F(2, "onRequestFinish: request type is fetchNodes, setting up rootNode");
                 this->m_publicNode = api->getRootNode()->copy();
                 break;
             case mega::MegaRequest::TYPE_GET_PUBLIC_NODE:
-                VLOG_F(2, "MegaAppRequestListener: onRequestFinish: request type is getPublicNode, setting publicNode");
+                VLOG_F(2, "onRequestFinish: request type is getPublicNode, setting publicNode");
                 this->m_publicNode = request->getPublicMegaNode()->copy();
                 break;
         }
@@ -63,14 +63,14 @@ void MegaAppRequestListener::onRequestFinish(mega::MegaApi* api, mega::MegaReque
 
     if(requestType != mega::MegaRequest::TYPE_LOGIN && requestType != mega::MegaRequest::TYPE_DELETE)
     {
-        VLOG_F(2, "MegaAppRequestListener: onRequestFinish: calling lockAndNotify");
+        VLOG_F(2, "onRequestFinish: calling lockAndNotify");
         this->lockAndNotify();
     }
 }
 
 void MegaAppRequestListener::onRequestTemporaryError(mega::MegaApi* api, mega::MegaRequest *request, mega::MegaError* error)
 {
-    VLOG_F(2, "MegaAppRequestListener: onRequestTemporaryError: %s", error->toString());
+    VLOG_F(2, "onRequestTemporaryError: %s", error->toString());
 }
 
 mega::MegaNode* MegaAppRequestListener::GetPublicNode()
@@ -95,7 +95,7 @@ void MegaAppRequestListener::Reset()
 
 void MegaAppRequestListener::Wait()
 {
-    VLOG_F(2, "MegaAppRequestListener: Wait: waiting for condition_variable to be notified");
+    VLOG_F(2, "Wait: waiting for condition_variable to be notified");
     std::unique_lock<std::mutex> lock(this->m_mu);
     this->m_cv.wait(lock, [this]{return this->m_notified;});
 }

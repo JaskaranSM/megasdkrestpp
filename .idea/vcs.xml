@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/dependencies/SimpleJSON" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/dependencies/served" vcs="Git" />
   </component>
 </project>

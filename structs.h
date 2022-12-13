@@ -18,6 +18,9 @@ struct DownloadInfo
     std::string gid;
     int errorCode;
     std::string errorString;
+    bool isFailed;
+    bool isCancelled;
+    bool isCompleted;
 };
 
 struct AddDownloadResp

@@ -18,14 +18,14 @@ bool MegaDownload::IsCompleted()
     return this->m_listener->IsCompleted();
 }
 
-const char* MegaDownload::Gid()
+std::string MegaDownload::Gid()
 {
-    return this->m_gid.c_str();
+    return this->m_gid;
 }
 
-const char* MegaDownload::Name()
+std::string MegaDownload::Name()
 {
-    return this->m_name.c_str();
+    return this->m_name;
 }
 
 int64_t MegaDownload::CompletedLength()
@@ -48,12 +48,29 @@ int MegaDownload::GetErrorCode()
     return this->m_listener->GetErrorCode();
 }
 
-const char* MegaDownload::GetErrorString()
+std::string MegaDownload::GetErrorString()
 {
-    return this->m_listener->GetErrorString().c_str();
+    return this->m_listener->GetErrorString();
 }
 
 int MegaDownload::GetState()
 {
     return this->m_listener->GetState();
+}
+
+DownloadInfo* MegaDownload::ToDownloadInfo()
+{
+    struct DownloadInfo* info = new DownloadInfo();
+    info->gid = this->Gid();
+    info->name = this->Name();
+    info->errorCode = this->GetErrorCode();
+    info->errorString = this->GetErrorString();
+    info->completedLength = this->CompletedLength();
+    info->totalLength = this->TotalLength();
+    info->speed = this->Speed();
+    info->state = this->GetState();
+    info->isCancelled = this->m_listener->IsCancelled();
+    info->isFailed = this->m_listener->IsFailed();
+    info->isCompleted = this->m_listener->IsCompleted();
+    return info;
 }

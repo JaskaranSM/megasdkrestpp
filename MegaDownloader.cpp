@@ -40,7 +40,7 @@ MegaDownload* MegaDownloader::GetDownloadByGid(std::string gid)
 {
     for (auto const& dl : this->m_downloads)
     {
-        LOG_F(INFO, "dl.Gid(): %s == %s", dl->Gid(), gid.c_str());
+        LOG_F(INFO, "dl.Gid(): %s == %s", dl->Gid().c_str(), gid.c_str());
         if (dl->Gid() == gid) {
             return dl;
         }
@@ -53,7 +53,7 @@ int MegaDownloader::CancelDownloadByGid(std::string gid)
     MegaDownload* dl = GetDownloadByGid(gid);
     if(dl == nullptr)
     {
-        return 1;
+        return 404;
     }
     return dl->CancelDownload();
 }
@@ -67,6 +67,7 @@ AddDownloadResp* MegaDownloader::AddDownload(const char* link, const char* dir)
     LOG_F(INFO, "AddDownload: gid: %s", resp->gid.c_str());
     MegaAppRequestListener* reqListener = new MegaAppRequestListener(this->m_api);
     MegaAppTransferListener* transferListener = new MegaAppTransferListener(gid, this->m_api);
+    LOG_F(INFO, "AddDownload: listeners created");
     if(utils.IsMegaFolder(link))
     {
         LOG_F(INFO, "AddDownload: starting loginToFolder");
@@ -104,7 +105,8 @@ AddDownloadResp* MegaDownloader::AddDownload(const char* link, const char* dir)
     fpath += "/";
     fpath += fname;
     transferListener->SetTotalLength(this->m_api->getSize(reqListener->GetPublicNode()));
-    MegaDownload* dl = new MegaDownload(reqListener->GetPublicNode()->getName(), gid, transferListener);
+    LOG_F(INFO, "Starting Download: %s : %s", fname, fpath.c_str());
+    MegaDownload* dl = new MegaDownload(std::string(fname), gid, transferListener);
     this->registerDownload(dl);
     this->m_api->startDownload(reqListener->GetPublicNode(), fpath.c_str(), "", NULL, false, NULL, transferListener);
     return resp;
