@@ -39,7 +39,7 @@ if platform.machine() == "aarch64":
     build_triplet = "arm64-linux-mega"
     addArm64Triplet(build_triplet) #megasdk atm does not have an arm64-linux triplet in repo.
 else:
-    build_triplet = "x86-linux-mega"
+    build_triplet = "x64-linux-mega"
 sdk_build_artifacts_path = os.path.join(sdk_path, f"build-{build_triplet}-Release")
 
 dep_static_libssl = "libssl.a"
