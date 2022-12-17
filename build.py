@@ -1,14 +1,46 @@
 import os
+import platform
+
+def addArm64Triplet(build_triplet):
+    triplet = """set(VCPKG_TARGET_ARCHITECTURE arm64)
+set(VCPKG_CRT_LINKAGE dynamic)
+set(VCPKG_CMAKE_SYSTEM_NAME Linux)
+set(VCPKG_LINUX_ARCHITECTURES arm64) # unused in build_from_scratch
+
+if(PORT MATCHES "curl" OR
+   PORT MATCHES "ffmpeg" OR
+   PORT MATCHES "c-ares")
+    # build this library as dynamic (usually because it is LGPL licensed)
+    set(VCPKG_LIBRARY_LINKAGE dynamic)
+else()
+    # build this library statically (much simpler installation, debugging, etc)
+    set(VCPKG_LIBRARY_LINKAGE static)
+endif()
+
+set(VCPKG_C_FLAGS "${VCPKG_C_FLAGS}")
+set(VCPKG_CXX_FLAGS "${VCPKG_CXX_FLAGS}")
+set(VCPKG_LINKER_FLAGS "${VCPKG_LINKER_FLAGS}")
+"""
+    triplet_dir = os.path.join(sdk_cmake_builder_path, "vcpkg_extra_triplets")
+    arm64_triplet_path = os.path.join(triplet_dir, f"{build_triplet}.cmake")
+    with open(arm64_triplet_path, "w") as f:
+        f.write(triplet)
+        f.flush()
+
 main_dir = os.getcwd()
 dependencies = os.path.join(main_dir, "dependencies")
 sdk_path = os.path.join(dependencies, "sdk")
 sdk_headers_path = os.path.join(sdk_path, "include")
-sdk_build_artifacts_path = os.path.join(sdk_path, "build-arm64-linux-mega-Release")
 sdk_cmake_builder_path = os.path.join(sdk_path, "contrib", "cmake")
 project_libs_path = os.path.join(dependencies, "libs")
 project_mega_sdk_include_path = os.path.join(dependencies, "include")
 project_artifacts_path = os.path.join(main_dir, "cmake-build-debug")
-build_triplet = "arm64-linux-mega"
+if platform.machine() == "aarch64":
+    build_triplet = "arm64-linux-mega"
+    addArm64Triplet(build_triplet) #megasdk atm does not have an arm64-linux triplet in repo.
+else:
+    build_triplet = "x86-linux-mega"
+sdk_build_artifacts_path = os.path.join(sdk_path, f"build-{build_triplet}-Release")
 
 dep_static_libssl = "libssl.a"
 dep_static_libcrypto = "libcrypto.a"
@@ -16,6 +48,7 @@ dep_static_libcryptopp = "libcryptopp.a"
 dep_static_libsodium = "libsodium.a"
 dep_static_libsqlite3 = "libsqlite3.a"
 dep_static_libmega = "libMega.a"
+
 
 def runCmd(cmd):
     print(cmd)
