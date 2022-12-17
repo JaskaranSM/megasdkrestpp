@@ -27,14 +27,23 @@ public:
             json::JSON reqBody = json::JSON::Load(req.body());
             std::string email = reqBody["email"].ToString();
             std::string password = reqBody["password"].ToString();
-            LOG_F(INFO, "Parsed email: %s | password: %s", email.c_str(), password.c_str());
-            auto resp = downloader->Login(email.c_str(), password.c_str());
+            VLOG_F(2, "Parsed email: %s | password: %s", email.c_str(), password.c_str());
             json::JSON obj = json::Object();
-            obj["error_code"] = resp->errorCode;
-            obj["error_string"] = resp->errorString;
             std::ostringstream stream;
-            stream << obj;
-            res << stream.str();
+            if (email == "" || password == "")
+            {
+                obj["error_code"] = 401;
+                obj["error_string"] = "credentials not properly provided";
+                res.set_status(401);
+                stream << obj;
+                res << stream.str();
+            } else {
+                auto resp = downloader->Login(email.c_str(), password.c_str());
+                obj["error_code"] = resp->errorCode;
+                obj["error_string"] = resp->errorString;
+                stream << obj;
+                res << stream.str();
+            }
         };
     }
 
@@ -44,15 +53,25 @@ public:
             json::JSON reqBody = json::JSON::Load(req.body());
             std::string link = reqBody["link"].ToString();
             std::string dir = reqBody["dir"].ToString();
-            VLOG_F(2, "Parsed link: %s | dir: %s", link.c_str(), dir.c_str());
-            auto resp = downloader->AddDownload(link.c_str(), dir.c_str());
             json::JSON obj = json::Object();
-            obj["gid"] = resp->gid;
-            obj["error_code"] = resp->errorCode;
-            obj["error_string"] = resp->errorString;
             std::ostringstream stream;
-            stream << obj;
-            res << stream.str();
+            VLOG_F(2, "Parsed link: %s | dir: %s", link.c_str(), dir.c_str());
+            if (link == "" || dir == "")
+            {
+                obj["error_code"] = 401;
+                obj["error_string"] = "link or dir not provided.";
+                res.set_status(401);
+                stream << obj;
+                res << stream.str();
+            } else {
+                auto resp = downloader->AddDownload(link.c_str(), dir.c_str()); 
+                obj["gid"] = resp->gid;
+                obj["error_code"] = resp->errorCode;
+                obj["error_string"] = resp->errorString;
+                stream << obj;
+                res << stream.str();
+            }
+            
         };
     }
 
@@ -61,15 +80,24 @@ public:
         return [downloader](served::response & res, const served::request & req) {
             json::JSON reqBody = json::JSON::Load(req.body());
             std::string gid = reqBody["gid"].ToString();
-            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
-            auto code = downloader->CancelDownloadByGid(gid);
             json::JSON obj = json::Object();
-            obj["gid"] = gid;
-            obj["error_code"] = code;
-            obj["error_string"] = "";
             std::ostringstream stream;
-            stream << obj;
-            res << stream.str();
+            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
+            if (gid == "")
+            { 
+                obj["error_code"] = 401;
+                obj["error_string"] = "gid not provided.";
+                res.set_status(401);
+                stream << obj;
+                res << stream.str();
+            } else {
+                auto code = downloader->CancelDownloadByGid(gid);
+                obj["gid"] = gid;
+                obj["error_code"] = code;
+                obj["error_string"] = "";
+                stream << obj;
+                res << stream.str();
+            }
         };
     }
 
