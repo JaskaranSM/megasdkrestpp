@@ -40,7 +40,6 @@ MegaDownload* MegaDownloader::GetDownloadByGid(std::string gid)
 {
     for (auto const& dl : this->m_downloads)
     {
-        LOG_F(INFO, "dl.Gid(): %s == %s", dl->Gid().c_str(), gid.c_str());
         if (dl->Gid() == gid) {
             return dl;
         }

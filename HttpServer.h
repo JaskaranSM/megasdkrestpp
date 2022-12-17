@@ -16,7 +16,6 @@ const char kGetStatusEndpoint[] = "/getstatus";
 const char kCancelDownloadEndpoint[] = "/canceldownload";
 const char kLoginEndpoint[] = "/login";
 const char kIPAddress[] = "0.0.0.0";
-const char kPort[] = "5000";
 
 class HttpServer {
 public:
@@ -45,7 +44,7 @@ public:
             json::JSON reqBody = json::JSON::Load(req.body());
             std::string link = reqBody["link"].ToString();
             std::string dir = reqBody["dir"].ToString();
-            LOG_F(INFO, "Parsed link: %s | dir: %s", link.c_str(), dir.c_str());
+            VLOG_F(2, "Parsed link: %s | dir: %s", link.c_str(), dir.c_str());
             auto resp = downloader->AddDownload(link.c_str(), dir.c_str());
             json::JSON obj = json::Object();
             obj["gid"] = resp->gid;
@@ -117,11 +116,11 @@ public:
         this->multiplexer.handle(kCancelDownloadEndpoint).post(this->CancelDownload(this->downloader));
     }
 
-    void StartServer()
+    void StartServer(const char* port, int threads)
     {
-        served::net::server server(kIPAddress, kPort, this->multiplexer);
+        served::net::server server(kIPAddress, port, this->multiplexer);
         LOG_F(INFO, "Starting web server");
-        server.run(1);
+        server.run(threads);
     }
 
 private:

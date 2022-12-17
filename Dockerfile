@@ -30,4 +30,6 @@ ENV VCPKG_FORCE_SYSTEM_BINARIES=1
 
 RUN python3 build.py 
 
-ENTRYPOINT ["/cmake-build-debug/megasdkrestpp"]
+RUN echo "build completed"
+
+CMD ["/usr/src/app/cmake-build-debug/megasdkrestpp"]

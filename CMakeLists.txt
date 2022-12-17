@@ -15,5 +15,4 @@ set(SERVED_BUILD_STATIC ON CACHE BOOL "enable static lib")
 add_subdirectory(dependencies/served)
 include_directories(.)
 add_executable(megasdkrestpp main.cpp MegaAppRequestListener.cpp MegaAppTransferListener.cpp MegaDownload.cpp MegaDownloader.cpp Utils.cpp log.cpp)
-
 target_link_libraries(megasdkrestpp ${CMAKE_SOURCE_DIR}/dependencies/libs/libMega.a ${CMAKE_SOURCE_DIR}/dependencies/libs/libcryptopp.a pthread ${CMAKE_SOURCE_DIR}/dependencies/libs/libsqlite3.a curl ${CMAKE_SOURCE_DIR}/dependencies/libs/libssl.a ${CMAKE_SOURCE_DIR}/dependencies/libs/libcrypto.a cares ${CMAKE_SOURCE_DIR}/dependencies/libs/libsodium.a rt dl served)

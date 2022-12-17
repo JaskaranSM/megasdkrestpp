@@ -3,12 +3,12 @@ main_dir = os.getcwd()
 dependencies = os.path.join(main_dir, "dependencies")
 sdk_path = os.path.join(dependencies, "sdk")
 sdk_headers_path = os.path.join(sdk_path, "include")
-sdk_build_artifacts_path = os.path.join(sdk_path, "build-x64-linux-mega-Release")
+sdk_build_artifacts_path = os.path.join(sdk_path, "build-arm64-linux-mega-Release")
 sdk_cmake_builder_path = os.path.join(sdk_path, "contrib", "cmake")
 project_libs_path = os.path.join(dependencies, "libs")
 project_mega_sdk_include_path = os.path.join(dependencies, "include")
 project_artifacts_path = os.path.join(main_dir, "cmake-build-debug")
-build_triplet = "x64-linux-mega"
+build_triplet = "arm64-linux-mega"
 
 dep_static_libssl = "libssl.a"
 dep_static_libcrypto = "libcrypto.a"
