@@ -5,7 +5,7 @@ This is a cpp based microservice powered by MegaSDK, served and SimpleJSON. This
 ## Endpoints
 
 - `POST /login`  
-  This endpoint is used to perform a login request on the MegaApi object so that the further requests are authenticated such as transfers.
+  This endpoint is used to perform a login request on the MegaApi object so that the further requests are authenticated such as transfers.  
   Request payload:
   ```
   {
@@ -21,7 +21,7 @@ This is a cpp based microservice powered by MegaSDK, served and SimpleJSON. This
   }
   ```
 - `POST /adddownload`  
-  This endpoint is used to create a download from the mega.nz shareable link in the provided directory in the request payload. This method returns a random value called GID which will be used to reference this download in other requests. The clients are supposed to save it somewhere.
+  This endpoint is used to create a download from the mega.nz shareable link in the provided directory in the request payload. This method returns a random value called GID which will be used to reference this download in other requests. The clients are supposed to save it somewhere.  
   Request payload:
   ```
   {
@@ -38,7 +38,7 @@ This is a cpp based microservice powered by MegaSDK, served and SimpleJSON. This
   }
   ```
 - `POST /getstatus`  
-  This endpoint provides the current status of the download registered in the download manager by using the gid provided in request payload.
+  This endpoint provides the current status of the download registered in the download manager by using the gid provided in request payload.  
   Request payload:
   ```
   {
@@ -61,7 +61,7 @@ This is a cpp based microservice powered by MegaSDK, served and SimpleJSON. This
   }
   ```
 - `POST /canceldownload`  
-  This endpoint is for cancelling download present in the download manager. The gid is used to reference the download to cancel.
+  This endpoint is for cancelling download present in the download manager. The gid is used to reference the download to cancel.  
   Request payload:
   ```
   {
