@@ -63,7 +63,7 @@ def createDirs():
     os.makedirs(project_artifacts_path, exist_ok=True)
 
 def isPortBlacklisted(line):
-    blacklisted_libs = ["ffmpeg", "freeimage","libpng","libjpeg-turbo","tiff","openjpeg","libwebp","libraw","jxrlib","openexr","jasper","liblzma","python3","libffi","opengl","freeglut", "pdfium","pdfium-freetype","icu","icu","lcms","libjpeg-turbo","openjpeg","bzip2","libpng"]
+    blacklisted_libs = ["ffmpeg", "freeimage","libpng","libjpeg-turbo","tiff","openjpeg","libwebp","libraw","jxrlib","openexr","jasper","liblzma","python3","libffi","opengl","freeglut", "pdfium","pdfium-freetype","icu","icu","lcms","libjpeg-turbo","openjpeg","bzip2","libpng", "pcre", "libuv"]
     for lib in blacklisted_libs:
         if line.startswith(lib):
             return True
