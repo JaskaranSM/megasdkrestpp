@@ -81,7 +81,7 @@ def setupIncludeDir():
 
 def buildProject():
     changeDir(main_dir)
-    runCmd(f'cmake --build {project_artifacts_path} --target megasdkrestpp -j 1')
+    runCmd(f'cmake --build {project_artifacts_path} --target megasdkrestpp')
 
 def configureCmake():
     changeDir(main_dir)
