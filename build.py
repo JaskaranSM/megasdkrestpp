@@ -62,6 +62,26 @@ def createDirs():
     os.makedirs(project_libs_path, exist_ok=True)
     os.makedirs(project_artifacts_path, exist_ok=True)
 
+def isPortBlacklisted(line):
+    blacklisted_libs = ["ffmpeg", "freeimage","libpng","libjpeg-turbo","tiff","openjpeg","libwebp","libraw","jxrlib","openexr","jasper","liblzma","python3","libffi","opengl","freeglut", "pdfium","pdfium-freetype","icu","icu","lcms","libjpeg-turbo","openjpeg","bzip2","libpng"]
+    for lib in blacklisted_libs:
+        if line.startswith(lib):
+            return True
+    return False 
+
+def patchPreferredPorts():
+    preferred_ports_file_path = os.path.join(sdk_cmake_builder_path, "preferred-ports-sdk.txt")
+    with open(preferred_ports_file_path, "r") as f:
+        file_data =  f.readlines()
+    new_file_data = []
+    for line in file_data:
+        if isPortBlacklisted(line):
+            line = f"#{line}"
+        new_file_data.append(line)
+    with open(preferred_ports_file_path, "w") as f:
+        for line in new_file_data:
+            f.write(line)
+
 def buildMegaSDK():
     changeDir(sdk_cmake_builder_path)
     runCmd(f'cmake -DTRIPLET={build_triplet} -DEXTRA_ARGS="-DUSE_PDFIUM=0;-DUSE_FREEIMAGE=0;-DENABLE_CHAT=0;-DENABLE_SYNC=0;-DHAVE_FFMPEG=0;-DUSE_MEDIAINFO=0" -P build_from_scratch.cmake')
@@ -94,6 +114,7 @@ def patchMegaSDKTestsCode():
 
 if __name__ == "__main__":
     createDirs()
+    patchPreferredPorts()
     patchMegaSDKTestsCode()
     buildMegaSDK()
     setupIncludeDir()
