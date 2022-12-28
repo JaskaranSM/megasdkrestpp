@@ -2,3 +2,5 @@ cmake-build-*
 dependencies/libs/*
 dependencies/include
 dependencies/3rdparty_sdk
+log.txt
+.vscode/*

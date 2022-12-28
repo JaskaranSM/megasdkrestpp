@@ -4,8 +4,9 @@
 #include <iostream>
 #include <log.h>
 
-MegaAppTransferListener::MegaAppTransferListener(std::string gid, mega::MegaApi *api)
+MegaAppTransferListener::MegaAppTransferListener(std::string gid, bool isFolder, mega::MegaApi *api)
 {
+    this->m_isFolder = isFolder;
     this->m_notified = false;
     this->m_gid = gid;
     this->m_api = api;
@@ -17,6 +18,7 @@ MegaAppTransferListener::MegaAppTransferListener(std::string gid, mega::MegaApi 
     this->m_completedLength = 0;
     this->m_speed = 0;
     this->m_totalLength = 0;
+    this->m_transferTag = 0;
 }
 
 void MegaAppTransferListener::lockAndNotify()
@@ -30,6 +32,7 @@ void MegaAppTransferListener::lockAndNotify()
 
 void MegaAppTransferListener::onTransferStart(mega::MegaApi *api, mega::MegaTransfer *transfer)
 {
+    this->m_transferTag = transfer->getTag();
     this->m_state = transfer->getState();
     this->m_currentTransfer = transfer->copy();
 }
@@ -65,10 +68,6 @@ void MegaAppTransferListener::onTransferUpdate(mega::MegaApi *api, mega::MegaTra
     this->m_speed = transfer->getSpeed();
     this->m_completedLength = transfer->getTransferredBytes();
     this->m_state = transfer->getState();
-    if (transfer->isFolderTransfer() && transfer->getStage() != 3) 
-    {
-        this->m_state = mega::MegaTransfer::STATE_QUEUED; 
-    }
     VLOG_F(3, "onTransferUpdate: %s ", transfer->getFileName());
 }
 
@@ -112,7 +111,16 @@ void MegaAppTransferListener::SetTotalLength(int64_t length)
 
 int MegaAppTransferListener::GetState()
 {
-    return this->m_state;
+    if (this->GetTransferTag() == 0) //transfer isnt started yet
+    {
+        return mega::MegaTransfer::STATE_QUEUED;
+    }
+    mega::MegaTransfer* transfer = this->m_api->getTransferByTag(this->GetTransferTag());
+    if (transfer == NULL)
+    {
+        return mega::MegaTransfer::STATE_FAILED;
+    }
+    return transfer->getState();
 }
 
 int MegaAppTransferListener::GetErrorCode()
@@ -138,6 +146,16 @@ bool MegaAppTransferListener::IsCancelled()
 bool MegaAppTransferListener::IsFailed()
 {
     return this->m_isFailed;
+}
+
+bool MegaAppTransferListener::IsFolderTransfer()
+{
+    return this->m_isFolder;
+}
+
+int MegaAppTransferListener::GetTransferTag()
+{
+    return this->m_transferTag;
 }
 
 void MegaAppTransferListener::Reset()

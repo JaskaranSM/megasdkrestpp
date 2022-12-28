@@ -6,11 +6,12 @@
 class MegaDownload
 {
 private:
+    mega::MegaNode* m_node;
     std::string m_name;
     std::string m_gid;
     MegaAppTransferListener *m_listener;
 public:
-    MegaDownload(std::string name, std::string gid, MegaAppTransferListener *listener);
+    MegaDownload(mega::MegaNode* node, std::string name, std::string gid, MegaAppTransferListener *listener);
     int CancelDownload();
     bool IsCompleted();
     std::string Gid();
@@ -21,5 +22,6 @@ public:
     int GetErrorCode();
     std::string GetErrorString();
     int GetState();
+    mega::MegaNode* GetMegaNode();
     DownloadInfo* ToDownloadInfo();
 };

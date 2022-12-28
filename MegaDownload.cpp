@@ -1,7 +1,8 @@
 #include "MegaDownload.h"
 
-MegaDownload::MegaDownload(std::string name, std::string gid, MegaAppTransferListener *listener)
+MegaDownload::MegaDownload(mega::MegaNode *node, std::string name, std::string gid, MegaAppTransferListener *listener)
 {
+    this->m_node = node;
     this->m_name = name;
     this->m_gid = gid;
     this->m_listener = listener;
@@ -56,6 +57,11 @@ std::string MegaDownload::GetErrorString()
 int MegaDownload::GetState()
 {
     return this->m_listener->GetState();
+}
+
+mega::MegaNode* MegaDownload::GetMegaNode()
+{
+    return this->m_node;
 }
 
 DownloadInfo* MegaDownload::ToDownloadInfo()

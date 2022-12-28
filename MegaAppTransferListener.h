@@ -18,6 +18,8 @@ private:
     bool m_isComplete;
     bool m_isCancelled;
     bool m_isFailed;
+    bool m_isFolder;
+    int m_transferTag;
     std::string m_gid;
 
     mega::MegaTransfer *m_currentTransfer;
@@ -32,7 +34,7 @@ private:
     void lockAndNotify();
 
 public:
-    MegaAppTransferListener(std::string gid, mega::MegaApi *api);
+    MegaAppTransferListener(std::string gid, bool isFolder, mega::MegaApi *api);
     void CancelTransfer();
     int64_t CompletedLength();
     int64_t TotalLength();
@@ -44,6 +46,8 @@ public:
     bool IsCompleted();
     bool IsCancelled();
     bool IsFailed();
+    bool IsFolderTransfer();
+    int GetTransferTag();
     void Reset();
     void Wait();
 };
