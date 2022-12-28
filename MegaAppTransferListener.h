@@ -28,6 +28,7 @@ private:
     void onTransferFinish(mega::MegaApi *api, mega::MegaTransfer *transfer, mega::MegaError* e);
     void onTransferTemporaryError(mega::MegaApi *api, mega::MegaTransfer *transfer, mega::MegaError e);
     void onTransferUpdate(mega::MegaApi *api, mega::MegaTransfer *transfer);
+    void onFolderTransferUpdate(mega::MegaApi *api, mega::MegaTransfer *transfer, int stage, uint32_t foldercount, uint32_t createdfoldercount, uint32_t filecount, const char *currentFolder, const char *currentFileLeafname);
     void lockAndNotify();
 
 public:

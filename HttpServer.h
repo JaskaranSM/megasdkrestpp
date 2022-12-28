@@ -82,7 +82,7 @@ public:
             std::string gid = reqBody["gid"].ToString();
             json::JSON obj = json::Object();
             std::ostringstream stream;
-            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
+            VLOG_F(2, "Parsed gid: %s", gid.c_str());
             if (gid == "")
             { 
                 obj["error_code"] = 401;
@@ -106,7 +106,7 @@ public:
         return [downloader](served::response & res, const served::request & req) {
             json::JSON reqBody = json::JSON::Load(req.body());
             std::string gid = reqBody["gid"].ToString();
-            LOG_F(INFO, "Parsed gid: %s", gid.c_str());
+            VLOG_F(2, "Parsed gid: %s", gid.c_str());
             json::JSON obj = json::Object();
             std::ostringstream stream;
             obj["gid"] = gid;

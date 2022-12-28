@@ -7,5 +7,5 @@
 void InitializeLogger(int argc, char* argv[], const char* logFilePath)
 {
     loguru::init(argc, argv);
-    loguru::add_file(logFilePath, loguru::Append, loguru::Verbosity_MAX);
+    loguru::add_file(logFilePath, loguru::Append, loguru::Verbosity_0);
 }

@@ -14,6 +14,9 @@ MegaAppTransferListener::MegaAppTransferListener(std::string gid, mega::MegaApi 
     this->m_isCancelled = false;
     this->m_isComplete = false;
     this->m_isFailed = false;
+    this->m_completedLength = 0;
+    this->m_speed = 0;
+    this->m_totalLength = 0;
 }
 
 void MegaAppTransferListener::lockAndNotify()
@@ -61,9 +64,24 @@ void MegaAppTransferListener::onTransferUpdate(mega::MegaApi *api, mega::MegaTra
 {
     this->m_speed = transfer->getSpeed();
     this->m_completedLength = transfer->getTransferredBytes();
-
     this->m_state = transfer->getState();
+    if (transfer->isFolderTransfer() && transfer->getStage() != 3) 
+    {
+        this->m_state = mega::MegaTransfer::STATE_QUEUED; 
+    }
     VLOG_F(3, "onTransferUpdate: %s ", transfer->getFileName());
+}
+
+void MegaAppTransferListener::onFolderTransferUpdate(mega::MegaApi *api, mega::MegaTransfer *transfer, int stage, uint32_t foldercount, uint32_t createdfoldercount, uint32_t filecount, const char *currentFolder, const char *currentFileLeafname)
+{
+    this->m_speed = transfer->getSpeed();
+    this->m_completedLength = transfer->getTransferredBytes();
+    this->m_state = transfer->getState();
+    if (stage != 3) 
+    {
+        this->m_state = mega::MegaTransfer::STATE_QUEUED; 
+    }
+    VLOG_F(3, "onFolderTransferUpdate: %s ", transfer->getFileName());
 }
 
 void MegaAppTransferListener::CancelTransfer()
